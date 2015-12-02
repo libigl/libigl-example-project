@@ -26,3 +26,9 @@
 *.exe
 *.out
 *.app
+
+*.un~
+*.swo
+*.swp
+
+build/*
