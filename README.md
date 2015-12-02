@@ -12,6 +12,9 @@ We recommend you to install libigl using git via:
 
     git clone --recursive https://github.com/libigl/libigl.git
 
+If you have installed libigl at `/path/to/libigl/` then a good place to clone
+this library is `/path/to/libigl-example-project/`.
+
 ## See the tutorial first
 
 Then build, run and understand the [libigl
