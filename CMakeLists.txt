@@ -19,6 +19,8 @@ include_directories( "${LIBIGL_INCLUDE_DIR}" )
 find_package(OpenGL REQUIRED)
 find_package(GLFWH REQUIRED)
 include_directories( ${GLFW_INCLUDE_DIR})
+find_package(GLEW REQUIRED)
+include_directories( ${GLEW_INCLUDE_DIR})
 
 set(NANOGUI_BUILD_PYTHON OFF CACHE BOOL " " FORCE)
 set(NANOGUI_BUILD_EXAMPLE OFF CACHE BOOL " " FORCE)
