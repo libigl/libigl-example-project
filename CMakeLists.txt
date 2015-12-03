@@ -29,9 +29,11 @@ include_directories("${NANOGUI_INCLUDE_DIR}/../ext/nanovg/src")
 list(APPEND LIBS "nanogui")
 
 if(APPLE)
-	set(CMAKE_CXX_LINK_FLAGS "-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo")
-         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2")
-endif (APPLE) #APPLE
+  set(CMAKE_CXX_LINK_FLAGS "-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2")
+ELSE()
+  find_package(GLEW REQUIRED)
+endif()
 
 link_directories(
   /usr/local/lib
