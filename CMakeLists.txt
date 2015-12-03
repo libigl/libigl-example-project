@@ -16,7 +16,6 @@ include_directories( "${LIBIGL_INCLUDE_DIR}" )
 find_package(OpenGL REQUIRED)
 find_package(GLFWH REQUIRED)
 include_directories( ${GLFW_INCLUDE_DIR})
-find_package(GLUT REQUIRED)
 
 set(NANOGUI_BUILD_PYTHON OFF CACHE BOOL " " FORCE)
 set(NANOGUI_BUILD_EXAMPLE OFF CACHE BOOL " " FORCE)
@@ -43,7 +42,6 @@ set(LIBS
   ${LIBS}
   ${LIBIGL_LIBRARIES} 
   ${OPENGL_LIBRARIES} 
-  ${GLUT_LIBRARIES}
 )
 
 FILE(GLOB SRCFILES *.cpp)
