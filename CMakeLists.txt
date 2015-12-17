@@ -23,11 +23,11 @@ include_directories( ${GLFW_INCLUDE_DIR})
 set(NANOGUI_BUILD_PYTHON OFF CACHE BOOL " " FORCE)
 set(NANOGUI_BUILD_EXAMPLE OFF CACHE BOOL " " FORCE)
 set(NANOGUI_BUILD_SHARED OFF CACHE BOOL " " FORCE)
-find_package(NANOGUI QUIET)
-
+find_package(NANOGUI REQUIRED)
 add_subdirectory(   "${NANOGUI_INCLUDE_DIR}/../" "nanogui")
 include_directories("${NANOGUI_INCLUDE_DIR}/../include")
 include_directories("${NANOGUI_INCLUDE_DIR}/../ext/nanovg/src")
+include_directories(${OPENGL_INCLUDE_DIR})
 list(APPEND LIBS "nanogui")
 
 if(APPLE)
@@ -46,10 +46,17 @@ link_directories(
 
 set(LIBS 
   ${LIBS}
-  ${LIBIGL_LIBRARIES} 
-  ${OPENGL_LIBRARIES} 
+  ${LIBIGL_LIBRARIES}
+  ${OPENGL_LIBRARIES}
+  ${GLEW_LIBRARIES}
+  ${NANOGUI_LIBRARIES}
 )
 
+if(UNIX AND NOT APPLE)
+  set(LIBS ${LIBS} ${LIBS})
+  set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -lGL -lGLU -lrt -lX11 -lXxf86vm -lXrandr -lpthread -lXi  -lXcursor -lXinerama ")
+endif(UNIX AND NOT APPLE)
+
 FILE(GLOB SRCFILES *.cpp)
-add_executable(example_bin ${SRCFILES})
+add_executable(example_bin ${SRCFILES} ${GLEW_SOURCES})
 target_link_libraries(example_bin ${LIBS})

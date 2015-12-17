@@ -4,8 +4,8 @@
 #  GLEW_FOUND - system has GLEW
 #  GLEW_INCLUDE_DIR - the GLEW include directory
 #  GLEW_SOURCES - the GLEW source file list
-
 FIND_PATH(GLEW_INCLUDE_DIR GL/glew.h
+   $ENV{LIBIGL}/external/nanogui/ext/glew/include
    ${PROJECT_SOURCE_DIR}/../../../external/nanogui/ext/glew/include
    ${PROJECT_SOURCE_DIR}/../../external/nanogui/ext/glew/include
    ${PROJECT_SOURCE_DIR}/../external/nanogui/ext/glew/include
@@ -14,7 +14,6 @@ FIND_PATH(GLEW_INCLUDE_DIR GL/glew.h
    ${PROJECT_SOURCE_DIR}/../../libigl/external/nanogui/ext/glew/include
    ${PROJECT_SOURCE_DIR}/../libigl/external/nanogui/ext/glew/include
    ${PROJECT_SOURCE_DIR}/libigl/external/nanogui/ext/glew/include
-   /usr/include
    /usr/local/include
    $ENV{GLEWROOT}/include
    $ENV{GLEW_ROOT}/include
@@ -34,5 +33,3 @@ if(GLEW_FOUND)
 else(GLEW_FOUND)
   message(WARNING "could NOT find glew")
 endif(GLEW_FOUND)
-
-MARK_AS_ADVANCED(GLEW_INCLUDE_DIR)
