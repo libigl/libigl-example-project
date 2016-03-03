@@ -1,8 +1,11 @@
 cmake_minimum_required(VERSION 2.6)
 project(example)
 
-### Check if libigl is found in the correct relative path
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/../libigl/cmake/CMakeLists.txt")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
+find_package(libigl QUIET)
+
+if (NOT LIBIGL_FOUND)
    message(FATAL_ERROR "libigl not found --- You can download it using: \n git clone --recursive https://github.com/libigl/libigl.git ${PROJECT_SOURCE_DIR}/../libigl")
 endif()
 
@@ -18,9 +21,9 @@ endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
 
-
 ### libIGL options: choose between header only and compiled static library
-# turn it on to speed up incremental compilation times
+# Header-only is preferred for small projects. For larger projects the static build
+# considerably reduces the compilation times
 option(LIBIGL_USE_STATIC_LIBRARY "Use LibIGL as static library" OFF)
 
 ### add a customizable menu bar
@@ -51,7 +54,7 @@ endif()
 ### Adding libIGL: choose the path to your local copy libIGL ###
 ### This is going to compile everything you requested ###
 #message(FATAL_ERROR "${PROJECT_SOURCE_DIR}/../libigl/cmake")
-add_subdirectory("${PROJECT_SOURCE_DIR}/../libigl/cmake" "libigl")
+add_subdirectory("${LIBIGL_INCLUDE_DIR}/../shared/cmake" "libigl")
 
 ### ligIGL information ###
 message("libIGL includes: ${LIBIGL_INCLUDE_DIRS}")
