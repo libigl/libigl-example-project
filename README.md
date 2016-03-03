@@ -7,7 +7,7 @@ project using libigl.
 ## See the tutorial first
 
 Then build, run and understand the [libigl
-tutorial](http://libigl.github.io/libigl/tutorial/tutorial.html). 
+tutorial](http://libigl.github.io/libigl/tutorial/tutorial.html).
 
 ## Compile
 
@@ -40,13 +40,3 @@ We recommend you to install libigl using git via:
 
 If you have installed libigl at `/path/to/libigl/` then a good place to clone
 this library is `/path/to/libigl-example-project/`.
-
-### Nanogui
-
-By default the sidebar Nanogui widget is _disabled_. You can enable this by
-defining `IGL_VIEWER_WITH_NANOGUI` when using `igl::Viewer` _or_ when building
-the project use:
-
-    cmake .. -DLIBIGL_VIEWER_WITH_NANOGUI=ON
-
-This is subject to change.
