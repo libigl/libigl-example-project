@@ -57,8 +57,7 @@ link_directories(
   ${EIGEN_DIRS}
 )
 
-set(LIBS 
-  ${LIBS}
+list(APPEND LIBS 
   ${LIBIGL_LIBRARIES}
   ${OPENGL_LIBRARIES}
   ${GLEW_LIBRARIES}
