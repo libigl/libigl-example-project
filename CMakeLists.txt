@@ -19,9 +19,10 @@ else()
   # Libigl requires a modern C++ compiler that supports c++11
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11") 
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "." )
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
+
 
 # libigl options: choose between header only and compiled static library
 # Header-only is preferred for small projects. For larger projects the static build
