@@ -47,7 +47,7 @@ option(LIBIGL_WITH_MATLAB      "Use Matlab"         OFF) # This option is not su
 option(LIBIGL_WITH_MOSEK       "Use MOSEK"          OFF) # This option is not supported yet
 option(LIBIGL_WITH_CGAL        "Use CGAL"           OFF)
 if(LIBIGL_WITH_CGAL) # Do not remove or move this block, the cgal build system fails without it
-  find_package(CGAL REQUIRED)
+  find_package(CGAL REQUIRED COMPONENTS Core)
   set(CGAL_DONT_OVERRIDE_CMAKE_FLAGS TRUE CACHE BOOL "CGAL's CMAKE Setup is super annoying ")
   include(${CGAL_USE_FILE})
 endif()
