@@ -78,8 +78,13 @@ if(BUILD_SHARED_LIBS)
 endif()
 
 # Eigen
-find_package(Eigen3 REQUIRED)
-target_link_libraries(igl_common INTERFACE Eigen3::Eigen)
+find_package(Eigen3 QUIET NO_MODULE)
+if(TARGET Eigen3::Eigen)
+	# Use the imported target
+	target_link_libraries(igl_common INTERFACE Eigen3::Eigen)
+else()
+	target_include_directories(igl_common SYSTEM INTERFACE ${NANOGUI_DIR}/ext/eigen)
+endif()
 
 ################################################################################
 
@@ -386,7 +391,7 @@ if(LIBIGL_WITH_OPENGL)
 		### Compile the viewer
 		if(LIBIGL_WITH_VIEWER)
 			compile_igl_module("viewer" "")
-			target_link_libraries(igl_viewer ${LINK_TYPE} glfw glew OpenGL::GL)
+			target_link_libraries(igl_viewer ${LINK_TYPE} igl_core glfw glew OpenGL::GL)
 
 			if(LIBIGL_WITH_NANOGUI)
 				target_compile_definitions(igl_viewer PUBLIC -DIGL_VIEWER_WITH_NANOGUI)
