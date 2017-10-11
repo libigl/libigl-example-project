@@ -3,34 +3,34 @@
 #
 #  LIBIGL_FOUND - system has LIBIGL
 #  LIBIGL_INCLUDE_DIR - **the** LIBIGL include directory
-#  LIBIGL_INCLUDE_DIRS - LIBIGL include directories
-#  LIBIGL_SOURCES - the LIBIGL source files
-if(NOT LIBIGL_FOUND)
+if(LIBIGL_FOUND)
+    return()
+endif()
 
-FIND_PATH(LIBIGL_INCLUDE_DIR igl/readOBJ.h
-   ${PROJECT_SOURCE_DIR}/../../include
-   ${PROJECT_SOURCE_DIR}/../include
-   ${PROJECT_SOURCE_DIR}/include
-   ${PROJECT_SOURCE_DIR}/libigl/include
-   ${PROJECT_SOURCE_DIR}/../libigl/include
-   ${PROJECT_SOURCE_DIR}/../../libigl/include
-   $ENV{LIBIGL}/include
-   $ENV{LIBIGLROOT}/include
-   $ENV{LIBIGL_ROOT}/include
-   $ENV{LIBIGL_DIR}/include
-   $ENV{LIBIGL_DIR}/inc
-   /usr/include
-   /usr/local/include
-   /usr/local/igl/libigl/include
+find_path(LIBIGL_INCLUDE_DIR igl/readOBJ.h
+    HINTS
+        ENV LIBIGL
+        ENV LIBIGLROOT
+        ENV LIBIGL_ROOT
+        ENV LIBIGL_DIR
+    PATHS
+        ${CMAKE_SOURCE_DIR}/../..
+        ${CMAKE_SOURCE_DIR}/..
+        ${CMAKE_SOURCE_DIR}
+        ${CMAKE_SOURCE_DIR}/libigl
+        ${CMAKE_SOURCE_DIR}/../libigl
+        ${CMAKE_SOURCE_DIR}/../../libigl
+        /usr
+        /usr/local
+        /usr/local/igl/libigl
+    PATH_SUFFIXES include
 )
 
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(LIBIGL
+    "\nlibigl not found --- You can download it using:\n\tgit clone --recursive https://github.com/libigl/libigl.git ${CMAKE_SOURCE_DIR}/../libigl"
+    LIBIGL_INCLUDE_DIR)
+mark_as_advanced(LIBIGL_INCLUDE_DIR)
 
-if(LIBIGL_INCLUDE_DIR)
-   set(LIBIGL_FOUND TRUE)
-   set(LIBIGL_INCLUDE_DIRS ${LIBIGL_INCLUDE_DIR}  ${LIBIGL_INCLUDE_DIR}/../external/Singular_Value_Decomposition)
-   #set(LIBIGL_SOURCES
-   #   ${LIBIGL_INCLUDE_DIR}/igl/viewer/Viewer.cpp
-   #)
-endif()
-
-endif()
+list(APPEND CMAKE_MODULE_PATH "${LIBIGL_INCLUDE_DIR}/../shared/cmake")
+include(libigl)
