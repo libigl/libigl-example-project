@@ -3,8 +3,6 @@
 #
 #  LIBIGL_FOUND - system has LIBIGL
 #  LIBIGL_INCLUDE_DIR - **the** LIBIGL include directory
-#  LIBIGL_INCLUDE_DIRS - LIBIGL include directories
-#  LIBIGL_SOURCES - the LIBIGL source files
 if(LIBIGL_FOUND)
     return()
 endif()
