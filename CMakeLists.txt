@@ -6,7 +6,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # libigl
 option(LIBIGL_USE_STATIC_LIBRARY "Use libigl as static library" OFF)
 option(LIBIGL_WITH_ANTTWEAKBAR      "Use AntTweakBar"    OFF)
-option(LIBIGL_WITH_CGAL             "Use CGAL"           ON)
+option(LIBIGL_WITH_CGAL             "Use CGAL"           OFF)
 option(LIBIGL_WITH_COMISO           "Use CoMiso"         OFF)
 option(LIBIGL_WITH_CORK             "Use Cork"           OFF)
 option(LIBIGL_WITH_EMBREE           "Use Embree"         OFF)
@@ -25,10 +25,7 @@ option(LIBIGL_WITH_XML              "Use XML"            OFF)
 
 find_package(LIBIGL REQUIRED QUIET)
 
-FIND_PACKAGE( Boost REQUIRED )
-INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
-
 # Add your project files
 file(GLOB SRCFILES *.cpp)
 add_executable(${PROJECT_NAME}_bin ${SRCFILES})
-target_link_libraries(${PROJECT_NAME}_bin igl::core igl::viewer igl::cgal)
+target_link_libraries(${PROJECT_NAME}_bin igl::core igl::viewer)

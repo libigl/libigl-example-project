@@ -1,50 +1,34 @@
 #include <igl/viewer/Viewer.h>
-#include <igl/readOFF.h>
-#include <igl/cotmatrix.h>
-
-#include <gmpxx.h>
-
-#include<Eigen/SparseLU>
-#include<Eigen/SparseCholesky>
-
-Eigen::MatrixXd V;
-Eigen::MatrixXi F;
-Eigen::MatrixXd V_uv;
-
-
-typedef mpq_class myfloat;
-
-typedef Eigen::Matrix<myfloat,Eigen::Dynamic,Eigen::Dynamic> MatrixXmp;
-typedef Eigen::Matrix<myfloat,Eigen::Dynamic,1> VectorXmp;
 
 int main(int argc, char *argv[])
 {
-  igl::readOFF("/Users/daniele/git/libigl/tutorial/shared/camelhead.off", V, F);
-  Eigen::SparseMatrix<double> L;
-  igl::cotmatrix(V,F,L);
-  
-  Eigen::SparseMatrix<double> id_m(L.rows(), L.cols());
-  id_m.setIdentity();
+  // Inline mesh of a cube
+  const Eigen::MatrixXd V= (Eigen::MatrixXd(8,3)<<
+    0.0,0.0,0.0,
+    0.0,0.0,1.0,
+    0.0,1.0,0.0,
+    0.0,1.0,1.0,
+    1.0,0.0,0.0,
+    1.0,0.0,1.0,
+    1.0,1.0,0.0,
+    1.0,1.0,1.0).finished();
+  const Eigen::MatrixXi F = (Eigen::MatrixXi(12,3)<<
+    1,7,5,
+    1,3,7,
+    1,4,3,
+    1,2,4,
+    3,8,7,
+    3,4,8,
+    5,7,8,
+    5,8,6,
+    1,5,6,
+    1,6,2,
+    2,6,8,
+    2,8,4).finished().array()-1;
 
-  Eigen::SparseMatrix<myfloat> Lmp = id_m.cast<myfloat>() - L.cast<myfloat>();
-
-  VectorXmp bmp = VectorXmp::Constant(Lmp.rows(),0);
-
-  Eigen::SparseLU<Eigen::SparseMatrix<myfloat> > solver;
-  solver.compute(Lmp);
-  if(solver.info()!=Eigen::Success) {
-    std::cerr << "Failed decomposition" << std::endl;
-    exit(-1);
-  }
-  VectorXmp x = solver.solve(bmp);
-  if(solver.info()!=Eigen::Success) {
-    std::cerr << "Failed solve" << std::endl;
-    exit(-1);
-  }
-
-  Eigen::VectorXd xout(x.rows());
-  for(unsigned i=0;i<xout.rows();++i)
-    xout(i) = x(i).get_d();
-  
-  std::cerr << xout << std::endl;
+  // Plot the mesh
+  igl::viewer::Viewer viewer;
+  viewer.data.set_mesh(V, F);
+  viewer.data.set_face_based(true);
+  viewer.launch();
 }
