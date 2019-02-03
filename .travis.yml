@@ -1,0 +1,45 @@
+dist: trusty
+sudo: false
+language: cpp
+matrix:
+  include:
+  - os: linux
+    compiler: gcc # 4.8
+    addons:
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+        packages:
+        - xorg-dev
+        - libglu1-mesa-dev
+    env:
+    - MATRIX_EVAL=""
+  - os: linux
+    compiler: gcc-7
+    addons:
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+        packages:
+        - gcc-7
+        - g++-7
+        - xorg-dev
+        - libglu1-mesa-dev
+    env:
+    - MATRIX_EVAL="export CC=gcc-7 && CXX=g++-7"
+  - os: osx
+    compiler: clang
+    env:
+    - MATRIX_EVAL=""
+
+install:
+- git clone --recursive --depth=3 https://github.com/libigl/libigl.git
+- eval "${MATRIX_EVAL}"
+
+script:
+# Tutorials and tests
+- mkdir build
+- cd build
+- cmake ..
+- make -j 2
+
