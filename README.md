@@ -1,4 +1,6 @@
 # libigl example project
+[![Build Status](https://travis-ci.org/libigl/libigl-example-project.svg?branch=master)](https://travis-ci.org/libigl/libigl-example-project)
+[![Build status](https://ci.appveyor.com/api/projects/status/libigl/libigl-example-project?svg=true)](https://ci.appveyor.com/project/libigl/libigl-example-project/branch/master)
 
 A blank project example showing how to use libigl and cmake. Feel free and
 encouraged to copy or fork this project as a way of starting a new personal
