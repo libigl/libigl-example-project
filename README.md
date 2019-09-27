@@ -9,6 +9,16 @@ project using libigl.
 Then build, run and understand the [libigl
 tutorial](http://libigl.github.io/libigl/tutorial/).
 
+## Dependencies
+
+The only dependencies are stl, eigen, [libigl](http://libigl.github.io/libigl/) and
+the dependencies of the `igl::opengl::glfw::Viewer`.
+
+The cmake build system will attempt to find libigl according to environment variables (e.g., `LIBIGL`) and searching in common desitinations (e.g., `/usr/local/libigl/`). If you haven't installed libigl before, we recommend you to clone a copy of libigl right here:
+
+    cd libigl-example-project/
+    git clone https://github.com/libigl/libigl.git
+
 ## Compile
 
 Compile this project using the standard cmake routine:
@@ -27,18 +37,3 @@ From within the `build` directory just issue:
     ./example_bin
 
 A glfw app should launch displaying a 3D cube.
-
-## Dependencies
-
-The only dependencies are stl, eigen, [libigl](http://libigl.github.io/libigl/) and
-the dependencies of the `igl::opengl::glfw::Viewer`.
-
-We recommend you to install libigl using git via:
-
-    git clone https://github.com/libigl/libigl.git
-    cd libigl/
-    git submodule update --init --recursive
-    cd ..
-
-If you have installed libigl at `/path/to/libigl/` then a good place to clone
-this library is `/path/to/libigl-example-project/`.
