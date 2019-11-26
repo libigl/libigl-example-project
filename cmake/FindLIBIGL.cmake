@@ -9,9 +9,9 @@ endif()
 
 find_path(LIBIGL_INCLUDE_DIR igl/readOBJ.h
     HINTS
+        ${LIBIGL_DIR}
         ENV LIBIGL_DIR
     PATHS
-        ${LIBIGL_DIR}
         ${CMAKE_SOURCE_DIR}/../..
         ${CMAKE_SOURCE_DIR}/..
         ${CMAKE_SOURCE_DIR}
