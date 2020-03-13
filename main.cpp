@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     1,5,6,
     1,6,2,
     2,6,8,
-    2,8,4).finished().array()-1;
+    2,8,4).finished().array()-1; // Test
 
   // Plot the mesh
   igl::opengl::glfw::Viewer viewer;
