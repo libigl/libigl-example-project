@@ -58,11 +58,11 @@ int main(int argc, char * argv[])
     0.0,0.0,1.0,0.0,
     0.0,0.0,0.0,1.0,
     .5, .5, 0., 0.,
-    0.,.5,.5,0.,
     .5, 0., .5, 0,
+    0.,.5,.5,0.,
+    0., .5, 0.,.5,
     0.,0.,.5,.5,
-    0.5, 0.0,0.,0.5,
-    0., .5, 0.,.5).finished().array(); // Test 
+    0.5, 0.0,0.,0.5).finished().array(); // Test 
 
   V = OV;
   F = OF;
@@ -76,6 +76,53 @@ int main(int argc, char * argv[])
   igl::opengl::glfw::Viewer viewer;
   viewer.data().set_mesh(V,F);
   viewer.data().set_face_based(true);
+
+
+  // Wavelet stuff
+  float m = 1./3.;
+  const Eigen::MatrixXd I0 = (Eigen::MatrixXd(4,4)<<
+    1.0,m,m,m,
+    m,1.0,m,m,
+    m,m,1.0,m,
+    m,m,m,1.0).finished().array(); // Test 
+
+  Eigen::MatrixXd I1 = (Eigen::MatrixXd::Identity(10,10)).array(); // Test  
+  for(int i=0; i<10; i++)
+  {
+    for(int j=0; j<10; j++)
+    {
+      if(I1(i,j)==0)
+      {
+        I1(i,j) = 1./3.;
+      }
+    }
+  }
+
+  Eigen::MatrixXd I1Sub;
+  Eigen::VectorXi R = (Eigen::VectorXi(10)<<0, 1, 2, 3, 4, 5, 6, 7, 8, 9).finished().array();
+  Eigen::VectorXi C = (Eigen::VectorXi(6)<<4, 5, 6, 7, 8, 9).finished().array();
+
+  igl::slice(I1,R,C,I1Sub);
+  Eigen::MatrixXd alpha0 = I0.inverse() * P0.transpose() * I1Sub;
+  for(int i=0; i<4; i++)
+  {
+    for(int j=0; j<6; j++)
+    {
+      if(alpha0(i,j)==0.25)
+      {
+        alpha0(i,j) = -0.25;
+      }
+    }
+  }
+
+  cout << P0.transpose().inverse() * I0 * alpha0 << endl;
+
+
+
+
+  //--------------
+
+
 
   viewer.callback_key_down =
     [&](igl::opengl::glfw::Viewer & viewer, unsigned char key, int mod)->bool
@@ -93,10 +140,8 @@ int main(int argc, char * argv[])
         case '2':
         {
           igl::upsample( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
-          cout<<(P0*OV)<<endl;
+          cout<<"Number of vertices is: " << V.rows() << endl;
           cout<<"-------"<<endl;
-          V = P0*OV;
-          cout<<(V)<<endl;
           break;
         }
         case '3':
