@@ -16,11 +16,21 @@ int main(int argc, char * argv[])
   Eigen::MatrixXi F, OF;
   Eigen::MatrixXd V, OV;
 
-  // igl::read_triangle_mesh("/home/michelle/Documents/LIBIGL/hackathon/libigl-example-project/knightloop.off",OV,OF);
-  string repo_path = "/home/michelle/Documents/LIBIGL/LABELS_BUG/mishfork/libigl-example-project/";
-  repo_path += "3rdparty/libigl/tutorial/data/";
-  const string mesh_path = repo_path + "decimated-knight.off";
-  igl::read_triangle_mesh(mesh_path,OV,OF);
+  // inline mesh of a tetrahedron
+  OV = (Eigen::MatrixXd(4,3)<<
+    0.0,0.0,0.0,
+    1.0,0.0,0.0,
+    0.66,0.33,1.0,
+    1.0,1.0,0.0).finished();
+  OF = (Eigen::MatrixXi(4,3)<<
+    1,2,3,
+    1,3,4,
+    1,4,2,
+    2,4,3).finished().array()-1; // Test
+
+  // string repo_path = "/Users/mihcelle/Documents/wavelets/libigl-example-project/";
+  // const string mesh_path = repo_path + "001.obj";
+  // igl::read_triangle_mesh(mesh_path,OV,OF);
 
   V = OV;
   F = OF;
@@ -75,12 +85,6 @@ int main(int argc, char * argv[])
     };
   // viewer.launch();
 
-
-  // Begin wavelet
-  std::cout << "verts: " << V.rows() << std::endl;
-  std::cout << "faces: " << F.rows() << std::endl;
-  
-  Eigen::MatrixXi FC;
-  covering_mesh(F, FC);
+  test_covering_mesh(F, V);
 
 }

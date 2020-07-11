@@ -1,19 +1,28 @@
-#ifndef IGL_NO_EIGEN
-#  include <Eigen/Core>
-#endif
+#include "wt.h"
 #include <iostream>
 #include <vector>
+#include <map>
 
-using namespace std;
+// is_quadrisection
+// covering_mesh
+// connected_components
+// is_equivalence
 
-void printstuff()
-{
-    std::cout << "yoooooo" << std::endl;
+bool test_covering_mesh(
+	const Eigen::MatrixXi& F,
+	const Eigen::MatrixXd& V
+){
+  // Begin wavelet
+  std::cout << "Num verts: " << V.rows() << std::endl;
+  std::cout << "Num faces: " << F.rows() << std::endl;
+  
+  Eigen::MatrixXi F_c;
+  covering_mesh(F, F_c);
+	return true;
 };
 
-template <typename DerivedF>
 bool edge_incident_faces(
-	const Eigen::MatrixBase<DerivedF>& F,
+	const Eigen::MatrixXi& F,
 	std::map<std::pair<int,int>, std::vector<int>>& incident_faces
 ){
 	for(int f=0; f<F.rows(); f++)
@@ -29,16 +38,15 @@ bool edge_incident_faces(
 	return true;
 };
 
-template <typename DerivedF>
 bool covering_mesh(
-	const Eigen::MatrixBase<DerivedF>& F,
- 				Eigen::MatrixBase<DerivedF>& FC
+	const Eigen::MatrixXi& F,
+ 	Eigen::MatrixXi& F_c
 ){
 	std::map<std::pair<int,int>, std::vector<int>> incident_faces;
   edge_incident_faces(F, incident_faces);
-  std::cout << "number of edges: " << incident_faces.size() << std::endl;
+  std::cout << "Num edges: " << incident_faces.size() << std::endl;
 
-	vector< tuple<int, int, int> > tiles;
+	std::vector<std::tuple<int, int, int> > tiles;
 	for(int f=0; f<F.rows(); f++)
 	{
 		int v1 = F(f,0);
@@ -63,7 +71,6 @@ bool covering_mesh(
 
 		if(isRegular)
 		{
-
 			// Neighbouring triangles to current triangle
 			int nt1 = incident_faces[e1][0]==f ? incident_faces[e1][1] : f;
 			int nt2 = incident_faces[e2][0]==f ? incident_faces[e2][1] : f;
@@ -77,16 +84,19 @@ bool covering_mesh(
 				if(F(nt2, i)!=e2v1 && F(nt2, i)!=e2v2) v1p = F(nt2, i);
 				if(F(nt3, i)!=e3v1 && F(nt3, i)!=e3v2) v1p = F(nt3, i);
 			}
-			tiles.push_back(tuple<int, int, int>(v1p,v2p,v3p));
+			tiles.push_back(std::tuple<int, int, int>(v1p,v2p,v3p));
 		}
 
-		FC.setIdentity(tiles.size(),3);
+		F_c.setIdentity(tiles.size(),3);
 		for(int t=0; t < tiles.size(); t++)
 		{
-			FC(t, 0) = get<0>(tiles[t]);
-			FC(t, 1) = get<1>(tiles[t]);
-			FC(t, 2) = get<2>(tiles[t]);
+			F_c(t, 0) = std::get<0>(tiles[t]);
+			F_c(t, 1) = std::get<1>(tiles[t]);
+			F_c(t, 2) = std::get<2>(tiles[t]);
 		}
 	}
-	std::cout << "Number of tiles: " << FC.rows() << std::endl;
-}
+	std::cout << "Num tiles: " << F_c.rows() << std::endl;
+	return true;
+};
+
+
