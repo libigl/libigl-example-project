@@ -29,9 +29,10 @@ void connected_components(
 	const Eigen::MatrixXi& F,
  	std::vector<std::vector<int>>& sub_meshes
 );
-bool is_equivalence(
+void is_equivalence(
 	const Eigen::MatrixXi& F,
 	const Eigen::MatrixXd& V,
-	const std::vector<int>& sub_mesh
+	const std::vector<int>& candidate,
+	const Eigen::MatrixXi& F_c
 );
 bool is_quadrisection();
