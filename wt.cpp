@@ -4,21 +4,6 @@
 #include <vector>
 #include <map>
 
-void sort3(int arr[]) 
-{ 
-	// Insert arr[1] 
-	if (arr[1] < arr[0]) 
-		std::swap(arr[0], arr[1]); 
-
-	// Insert arr[2] 
-	if (arr[2] < arr[1]) 
-	{ 
-		std::swap(arr[1], arr[2]); 
-		if (arr[1] < arr[0]) 
-			std::swap(arr[1], arr[0]); 
-	} 
-};
-
 bool test_covering_mesh(
 	const Eigen::MatrixXi& F,
 	const Eigen::MatrixXd& V
@@ -297,6 +282,11 @@ void is_equivalence(
 			// candidate can be found in the original V
 			int found = true;
 			int temp = false;
+			std::map<int,bool> ov_visited;
+			for(int v=0;v<V.rows();v++)
+			{
+				ov_visited[v] = false;
+			}
 			for(int v=0; v<submesh_vertices.rows(); v++)
 			{
 				for(int ov=0; ov<V.rows();ov++)
@@ -304,9 +294,11 @@ void is_equivalence(
 					if(
 						submesh_vertices(v,0)==V(ov,0) &&
 						submesh_vertices(v,1)==V(ov,1) &&
-						submesh_vertices(v,2)==V(ov,2)
+						submesh_vertices(v,2)==V(ov,2) &&
+						ov_visited[ov] == false
 					){
 						temp = true;
+						ov_visited[ov] = true;
 						std::cout << "Vertex " << v 
 											<< " was found at location " 
 											<< ov << " !" << std::endl;
@@ -327,5 +319,19 @@ void is_equivalence(
 			if(found) { std::cout << "Gagnant!" << std::endl; }
 		} else{ std::cout << "Second test failed." << std::endl; }
 	}
-}
+};
 
+void sort3(int arr[]) 
+{ 
+	// Insert arr[1] 
+	if (arr[1] < arr[0]) 
+		std::swap(arr[0], arr[1]); 
+
+	// Insert arr[2] 
+	if (arr[2] < arr[1]) 
+	{ 
+		std::swap(arr[1], arr[2]); 
+		if (arr[1] < arr[0]) 
+			std::swap(arr[1], arr[0]); 
+	} 
+};
