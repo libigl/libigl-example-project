@@ -17,16 +17,38 @@ int main(int argc, char * argv[])
   Eigen::MatrixXd V, OV;
 
   // inline mesh of a tetrahedron
-  OV = (Eigen::MatrixXd(4,3)<<
-    0.0,0.0,0.0,
-    1.0,0.0,0.0,
-    0.66,0.33,1.0,
-    1.0,1.0,0.0).finished();
-  OF = (Eigen::MatrixXi(4,3)<<
-    1,2,3,
-    1,3,4,
-    1,4,2,
-    2,4,3).finished().array()-1; // Test
+  // OV = (Eigen::MatrixXd(4,3)<<
+  //   0.0,0.0,0.0,
+  //   1.0,0.0,0.0,
+  //   0.66,0.33,1.0,
+  //   1.0,1.0,0.0).finished();
+  // OF = (Eigen::MatrixXi(4,3)<<
+  //   1,2,3,
+  //   1,3,4,
+  //   1,4,2,
+  //   2,4,3).finished().array()-1; // Test
+
+  double x = std::sqrt(3)/2.;
+  double y = 0.5;
+  double l = 1.;
+
+  OV = (Eigen::MatrixXd(7,3)<<
+    y,-x,0,
+    1,0,0,
+    y,x,0,
+    -y,x,0,
+    -1,0,0,
+    -y,-x,0,
+    0,0,0
+    ).finished();
+  OF = (Eigen::MatrixXi(6,3)<<
+    2,7,1,
+    3,7,2,
+    3,4,7,
+    4,5,7,
+    7,5,6,
+    7,6,1).finished().array()-1; // Test
+
 
   // string repo_path = "/Users/mihcelle/Documents/wavelets/libigl-example-project/";
   // const string mesh_path = repo_path + "001.obj";
@@ -85,6 +107,7 @@ int main(int argc, char * argv[])
     };
   // viewer.launch();
 
+  igl::upsample( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
   test_covering_mesh(F, V);
 
 }

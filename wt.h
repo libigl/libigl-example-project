@@ -13,20 +13,23 @@ bool test_covering_mesh(
 );
 
 // WT methods
-bool edge_incident_faces(
+void edge_incident_faces(
 	const Eigen::MatrixXi& F,
 	std::map<std::pair<int,int>, std::vector<int>>& incident_faces
 );
-bool covering_mesh(
+void covering_mesh(
 	const Eigen::MatrixXi& F,
  	Eigen::MatrixXi& F_c
 );
-
 // sub_meshes: vector of vectors containing fids 
 // in a single connected component found 
-bool connected_components(
+void connected_components(
 	const Eigen::MatrixXi& F,
  	std::vector<std::vector<int>>& sub_meshes
 );
-bool isEquivalence();
-bool isQuadrisection();
+bool is_equivalence(
+	const Eigen::MatrixXi& F,
+	const Eigen::MatrixXd& V,
+	const std::vector<int>& sub_mesh
+);
+bool is_quadrisection();
