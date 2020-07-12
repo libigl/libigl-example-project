@@ -7,7 +7,7 @@
 #include <Eigen/Core>
 #include <iostream>
 #include <vector>
-#include "wt.h"
+#include "taubin.h"
 
 int main(int argc, char * argv[])
 {
