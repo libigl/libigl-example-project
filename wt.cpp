@@ -1,7 +1,23 @@
 #include "wt.h"
+#include <igl/upsample.h>
 #include <iostream>
 #include <vector>
 #include <map>
+
+void sort3(int arr[]) 
+{ 
+	// Insert arr[1] 
+	if (arr[1] < arr[0]) 
+		std::swap(arr[0], arr[1]); 
+
+	// Insert arr[2] 
+	if (arr[2] < arr[1]) 
+	{ 
+		std::swap(arr[1], arr[2]); 
+		if (arr[1] < arr[0]) 
+			std::swap(arr[1], arr[0]); 
+	} 
+};
 
 bool test_covering_mesh(
 	const Eigen::MatrixXi& F,
@@ -13,17 +29,131 @@ bool test_covering_mesh(
   
   Eigen::MatrixXi F_c;
 	std::vector<std::vector<int>> sub_meshes;
-  covering_mesh(F, F_c);
+	std::map<int, std::vector<int>> tile_sets;
+  covering_mesh(F, F_c, tile_sets);
 	std::cout << "Completed covering mesh" << std::endl;
 	std::cout << "Begin connected components" << std::endl;
   connected_components(F_c, sub_meshes);
 	
+	// Find a candidate connected component
 	for(auto it=sub_meshes.begin(); it!=sub_meshes.end(); it++)
 	{
-		std::cout << it->size() << std::endl; 
+		// First test
 		if(it->size()*4==F.rows())
 		{
-			is_equivalence(F,V,*it);
+			std::cout << "--Begin analyzing the candidate connected component--" << std::endl;
+			std::vector<int> V_i; // All the vids from og V in the tile set
+			Eigen::MatrixXi submesh; // Faces in the tile set
+			Eigen::MatrixXd submesh_vertices; // Vertex positions in the tile set
+
+			// Iterate over the fids used in F_c to make   
+			// the candidate connected component.
+			submesh.setIdentity(it->size(),3);
+			int f=0;
+			for(auto it2=it->begin(); it2!=it->end(); it2++)
+			{
+				for(int i=0; i<3; i++)
+				{
+					// Populate submesh as a matrix with
+					// rows being vids of V that form the tiles
+					// of the candidate.
+					submesh(f, i) = F_c(*it2,i);
+
+					// Populate V_i as a set of unique vids 
+					// encountered while iterating over
+					// the tiles which form the candidate.
+					if( std::find(V_i.begin(), V_i.end(), F_c(*it2,i)) == V_i.end() )
+					{
+						V_i.emplace_back(F_c(*it2,i));
+					}
+				}
+				f++;
+			}
+
+			// At this point:
+			// V_i has the vids of V in the candidate.
+			// submesh has #tilesincandidate rows
+			// where each row has the 3 vids from 
+			// V which make up that tile
+			assert(submesh.rows()==6);
+
+			// We need num verts and num edges in candidate
+			// connected component for the second test
+			std::map<std::pair<int,int>, std::vector<int>> incident_tiles;
+			edge_incident_faces(submesh, incident_tiles);
+
+			// Second test
+			if(V_i.size()+incident_tiles.size()==V.rows())
+			{
+				// Create a matrix of vertex positions
+				// with new index names
+				submesh_vertices.setIdentity(V_i.size(), 3);
+				int v=0;
+				std::map<int,int> vert_translator;
+				for(auto it2=V_i.begin(); it2!=V_i.end(); it2++)
+				{
+					for(int i=0; i<3; i++)
+					{
+						vert_translator[*it2] = v;
+						submesh_vertices(v,i) = V(*it2,i);
+					}
+					v++;
+				}
+
+				// Rename the vids in submesh to point to 
+				// vids in submesh_vertices as opposed 
+				// to V, cause they used to have the
+				// corners of the current candidate tile.
+				for(int f=0; f<submesh.rows(); f++)
+				{
+					submesh(f,0) = vert_translator[submesh(f,0)];
+					submesh(f,1) = vert_translator[submesh(f,1)];
+					submesh(f,2) = vert_translator[submesh(f,2)];
+				}
+
+				// Subdivide the candidate
+				igl::upsample( Eigen::MatrixXd(
+					Eigen::MatrixXd(submesh_vertices)), 
+					Eigen::MatrixXi(submesh), 
+					submesh_vertices, 
+					submesh);
+				assert(V.rows()==submesh_vertices.rows());
+				assert(V.cols()==submesh_vertices.cols());
+
+				// Make sure that every vert in the subdivided
+				// candidate can be found in the original V
+				int found = true;
+				int temp = false;
+				for(int v=0; v<submesh_vertices.rows(); v++)
+				{
+					for(int ov=0; ov<V.rows();ov++)
+					{
+						if(
+							submesh_vertices(v,0)==V(ov,0) &&
+							submesh_vertices(v,1)==V(ov,1) &&
+							submesh_vertices(v,2)==V(ov,2)
+						){
+							temp = true;
+							std::cout << "Vertex " << v 
+												<< " was found at location " 
+												<< ov << " !" << std::endl;
+						}
+					}
+
+					if(temp==true)
+					{
+						temp = false;
+					} else {
+						std::cout << "Candidtate failed" << std::endl;
+						found = false;
+						break;
+					}
+				}
+
+				// Third (final) test
+				if(found) { std::cout << "Gagnant!" << std::endl; }
+
+			} else{ std::cout << "Second test failed." << std::endl; }
 		}
 	}
 
@@ -52,7 +182,8 @@ void edge_incident_faces(
 
 void covering_mesh(
 	const Eigen::MatrixXi& F,
- 	Eigen::MatrixXi& F_c
+ 	Eigen::MatrixXi& F_c,
+	std::map<int, std::vector<int>>& tile_sets
 ){
 	std::map<std::pair<int,int>, std::vector<int>> incident_faces;
   edge_incident_faces(F, incident_faces);
@@ -61,15 +192,14 @@ void covering_mesh(
 	std::vector<std::tuple<int, int, int> > tiles;
 	for(int f=0; f<F.rows(); f++)
 	{
-		std::cout << "-----FACE: " << f << std::endl;
+		// std::cout << "-----FACE: " << f << std::endl;
 		int v1 = F(f,0);
 		int v2 = F(f,1);
 		int v3 = F(f,2);
 
-		std::cout << "v1: " << v1 << std:: endl; 
-		std::cout << "v2: " << v2 << std:: endl; 
-		std::cout << "v3: " << v3 << std:: endl; 
-
+		// std::cout << "v1: " << v1 << std:: endl; 
+		// std::cout << "v2: " << v2 << std:: endl; 
+		// std::cout << "v3: " << v3 << std:: endl; 
 
 		int e1v1 = std::min(v1,v2);
 		int e1v2 = std::max(v1,v2);
@@ -89,9 +219,9 @@ void covering_mesh(
 
 		if(isRegular)
 		{
-			std::cout << "e1: " << incident_faces[e1][0] << " " << incident_faces[e1][1] << std::endl;
-			std::cout << "e2: " << incident_faces[e2][0] << " " << incident_faces[e2][1] << std::endl;
-			std::cout << "e3: " << incident_faces[e3][0] << " " << incident_faces[e3][1] << std::endl;
+			// std::cout << "e1: " << incident_faces[e1][0] << " " << incident_faces[e1][1] << std::endl;
+			// std::cout << "e2: " << incident_faces[e2][0] << " " << incident_faces[e2][1] << std::endl;
+			// std::cout << "e3: " << incident_faces[e3][0] << " " << incident_faces[e3][1] << std::endl;
 			// Neighbouring triangles to current triangle
 			int nt1 = incident_faces[e1][0]==f ? incident_faces[e1][1] : incident_faces[e1][0];
 			int nt2 = incident_faces[e2][0]==f ? incident_faces[e2][1] : incident_faces[e2][0];
@@ -106,9 +236,9 @@ void covering_mesh(
 				if(F(nt3, i)!=e3v1 && F(nt3, i)!=e3v2) v3p = F(nt3, i);
 			}
 			tiles.push_back(std::tuple<int, int, int>(v1p,v2p,v3p));
-			std::cout << "nt1: " << nt1 << std::endl;
-			std::cout << "nt2: " << nt2 << std::endl;
-			std::cout << "nt3: " << nt3 << std::endl;
+			// std::cout << "nt1: " << nt1 << std::endl;
+			// std::cout << "nt2: " << nt2 << std::endl;
+			// std::cout << "nt3: " << nt3 << std::endl;
 		}
 
 		F_c.setIdentity(tiles.size(),3);
@@ -187,12 +317,6 @@ void connected_components(
 			delete temp;
 		}
 	}
-
-	// std::cout << sub_meshes.size() << std::endl;
-	// std::cout << sub_meshes.at(0).size() << std::endl;
-	// std::cout << sub_meshes.at(1).size() << std::endl;
-	// std::cout << sub_meshes.at(2).size() << std::endl;
-	// std::cout << sub_meshes.at(3).size() << std::endl;
 };
 
 bool is_equivalence(

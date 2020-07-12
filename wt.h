@@ -12,6 +12,7 @@ bool test_covering_mesh(
 	const Eigen::MatrixXd& V
 );
 
+void sort3(int arr[]);
 // WT methods
 void edge_incident_faces(
 	const Eigen::MatrixXi& F,
@@ -19,7 +20,8 @@ void edge_incident_faces(
 );
 void covering_mesh(
 	const Eigen::MatrixXi& F,
- 	Eigen::MatrixXi& F_c
+ 	Eigen::MatrixXi& F_c,
+	std::map<int, std::vector<int>>& tile_sets
 );
 // sub_meshes: vector of vectors containing fids 
 // in a single connected component found 
