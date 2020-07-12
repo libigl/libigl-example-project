@@ -105,7 +105,7 @@ int main(int argc, char * argv[])
       viewer.data().set_face_based(true);
       return true;
     };
-  // viewer.launch();
+  viewer.launch();
 
   igl::upsample( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
   test_covering_mesh(F, V);
