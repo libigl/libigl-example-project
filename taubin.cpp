@@ -1,11 +1,15 @@
-//http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.21.1125&rep=rep1&type=pdf
-
 #include "taubin.h"
 #include <igl/upsample.h>
 #include <iostream>
 #include <vector>
 #include <map>
 
+// Adapted from Gabriel Taubin's Loop Inverse Subdivsion Algorithm
+// Paper: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.21.1125&rep=rep1&type=pdf
+
+// Detect whether the input mesh has subdivision connectivity.
+// If so, partitions the input mesh into the coarse 
+// mesh and the new vertices after subdividing
 bool is_quadrisection(
 	const Eigen::MatrixXi& F,
 	const Eigen::MatrixXd& V,
@@ -44,6 +48,8 @@ bool is_quadrisection(
 	return false;
 };
 
+// Creates tiles from the input mesh,
+// And the tile sets covered by each
 void covering_mesh(
 	const Eigen::MatrixXi& F,
  	Eigen::MatrixXi& F_c,
@@ -116,6 +122,8 @@ void covering_mesh(
 	std::cout << "Num tiles: " << F_c.rows() << std::endl;
 };
 
+// Generate all possible connected 
+// components from the tiles
 void connected_components(
 	const Eigen::MatrixXi& tiles,
  	std::vector<std::vector<int>>& sub_meshes
@@ -183,6 +191,8 @@ void connected_components(
 	}
 };
 
+// Determine whether input connected component
+// has a bijection to the original mesh
 void is_equivalence(
 	const Eigen::MatrixXi& F,
 	const Eigen::MatrixXd& V,
@@ -335,6 +345,9 @@ void is_equivalence(
 	}
 };
 
+// Given input mesh, return a map with keys
+// being sorted two vertices forming and edge
+// and the values being the fids of the incident faces
 void edge_incident_faces(
 	const Eigen::MatrixXi& F,
 	std::map<std::pair<int,int>, std::vector<int>>& incident_faces
@@ -355,6 +368,7 @@ void edge_incident_faces(
 	}
 };
 
+// Sort an array of three entries
 void sort3(int arr[]) 
 { 
 	// Insert arr[1] 
