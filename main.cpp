@@ -114,8 +114,8 @@ int main(int argc, char * argv[])
 	Eigen::MatrixXd V_new;
   is_quadrisection(F, V, F_old, V_old, F_new, V_new);
 
-  V = V_new;
-  F = F_new;
+  V = V_old;
+  F = F_old;
 
   viewer.data().clear();
   viewer.data().set_mesh(V,F);
