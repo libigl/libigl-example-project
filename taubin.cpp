@@ -6,9 +6,13 @@
 #include <vector>
 #include <map>
 
-bool test_covering_mesh(
+bool is_quadrisection(
 	const Eigen::MatrixXi& F,
-	const Eigen::MatrixXd& V
+	const Eigen::MatrixXd& V,
+	Eigen::MatrixXi& F_old,
+	Eigen::MatrixXd& V_old,
+	Eigen::MatrixXi& F_new,
+	Eigen::MatrixXd& V_new
 ){
   // Begin wavelet
   std::cout << "Num verts in input mesh: " << V.rows() << std::endl;
@@ -25,32 +29,19 @@ bool test_covering_mesh(
   connected_components(F_c, sub_meshes);
 	std::cout << "Completed connected components" << std::endl;
 
+	std::cout << "F_old OG row size: " << F_old.rows() << std::endl;
+	std::cout << "V_old OG row size: " << V_old.rows() << std::endl;
+
 	// Find a candidate connected component
 	for(auto it=sub_meshes.begin(); it!=sub_meshes.end(); it++)
 	{
-		is_equivalence( F, V, *it, F_c );
+		is_equivalence( F, V, *it, F_c, F_old, V_old, F_new, V_new );
+		if(F_old.rows()>0 && V_old.rows()>0)
+		{
+			return true;
+		}
 	}
-	return true;
-};
-
-void edge_incident_faces(
-	const Eigen::MatrixXi& F,
-	std::map<std::pair<int,int>, std::vector<int>>& incident_faces
-){
-	for(int f=0; f<F.rows(); f++)
-	{
-		int v1 = F(f,0);
-		int v2 = F(f,1);
-		int v3 = F(f,2);
-
-		// std::cout << "v1: " << v1 << std::endl;
-    // std::cout << "v2: " << v2 << std::endl;
-    // std::cout << "v3: " << v3 << std::endl;
-
-		incident_faces[std::make_pair(std::min(v1,v2),std::max(v1,v2))].push_back(f);
-		incident_faces[std::make_pair(std::min(v2,v3),std::max(v2,v3))].push_back(f);
-		incident_faces[std::make_pair(std::min(v3,v1),std::max(v3,v1))].push_back(f);
-	}
+	return false;
 };
 
 void covering_mesh(
@@ -196,7 +187,11 @@ void is_equivalence(
 	const Eigen::MatrixXi& F,
 	const Eigen::MatrixXd& V,
 	const std::vector<int>& candidate,
-	const Eigen::MatrixXi& F_c
+	const Eigen::MatrixXi& F_c,
+	Eigen::MatrixXi& F_old,
+	Eigen::MatrixXd& V_old,
+	Eigen::MatrixXi& F_new,
+	Eigen::MatrixXd& V_new
 ){
 	// First test
 	if(candidate.size()*4==F.rows())
@@ -271,6 +266,9 @@ void is_equivalence(
 				submesh(f,2) = vert_translator[submesh(f,2)];
 			}
 
+			Eigen::MatrixXi F_pre_subdiv = Eigen::MatrixXi(submesh);
+			Eigen::MatrixXd V_pre_subdiv = Eigen::MatrixXd(submesh_vertices);
+
 			// Subdivide the candidate
 			igl::upsample( Eigen::MatrixXd(
 				Eigen::MatrixXd(submesh_vertices)), 
@@ -318,8 +316,42 @@ void is_equivalence(
 			}
 
 			// Third (final) test
-			if(found) { std::cout << "Gagnant!" << std::endl; }
-		} else{ std::cout << "Second test failed." << std::endl; }
+			if(found) 
+			{ 
+				std::cout << "Gagnant!" << std::endl; 
+				F_old = F_pre_subdiv;
+				V_old = V_pre_subdiv;
+				F_new = submesh.block(F_old.rows()-1, 0, submesh.rows()-F_old.rows(), 3);
+				V_new = submesh_vertices.block(V_old.rows()-1, 0, submesh_vertices.rows()-V_old.rows(), 3);
+				assert(F_new.rows()+F_old.rows() == submesh.rows());
+				assert(V_new.rows()+V_old.rows() == submesh_vertices.rows());
+
+			}
+		} 
+		else
+		{ 
+			std::cout << "Second test failed." << std::endl; 
+		}
+	}
+};
+
+void edge_incident_faces(
+	const Eigen::MatrixXi& F,
+	std::map<std::pair<int,int>, std::vector<int>>& incident_faces
+){
+	for(int f=0; f<F.rows(); f++)
+	{
+		int v1 = F(f,0);
+		int v2 = F(f,1);
+		int v3 = F(f,2);
+
+		// std::cout << "v1: " << v1 << std::endl;
+    // std::cout << "v2: " << v2 << std::endl;
+    // std::cout << "v3: " << v3 << std::endl;
+
+		incident_faces[std::make_pair(std::min(v1,v2),std::max(v1,v2))].push_back(f);
+		incident_faces[std::make_pair(std::min(v2,v3),std::max(v2,v3))].push_back(f);
+		incident_faces[std::make_pair(std::min(v3,v1),std::max(v3,v1))].push_back(f);
 	}
 };
 
