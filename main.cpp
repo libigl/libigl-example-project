@@ -105,9 +105,24 @@ int main(int argc, char * argv[])
       viewer.data().set_face_based(true);
       return true;
     };
-  viewer.launch();
 
   igl::upsample( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
-  test_covering_mesh(F, V);
+
+	Eigen::MatrixXi F_old;
+	Eigen::MatrixXd V_old;
+	Eigen::MatrixXi F_new;
+	Eigen::MatrixXd V_new;
+  is_quadrisection(F, V, F_old, V_old, F_new, V_new);
+
+  // Henrik takes nice photos
+
+  V = V_old;
+  F = F_old;
+
+  viewer.data().clear();
+  viewer.data().set_mesh(V,F);
+  viewer.data().set_face_based(true);
+
+  viewer.launch();
 
 }
