@@ -114,6 +114,8 @@ int main(int argc, char * argv[])
 	Eigen::MatrixXd V_new;
   is_quadrisection(F, V, F_old, V_old, F_new, V_new);
 
+  // Henrik takes nice photos
+
   V = V_old;
   F = F_old;
 
