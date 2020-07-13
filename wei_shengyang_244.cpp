@@ -284,12 +284,54 @@ void WT_Get_A(
         a_14, a_24, a_34, a_44;
 }
 
+void WT_GET_B(
+    Eigen::Vector4d& B
+) {
+    const double alpha_0 = WT_Coefficient_Alpha(0);
+    const double alpha_1 = WT_Coefficient_Alpha(1);
+
+    const double gamma_0 = WT_Coefficient_Gamma(0);
+    const double gamma_1 = WT_Coefficient_Gamma(1);
+    
+    const double delta_0 = WT_Coefficient_Delta(0);
+    const double delta_1 = WT_Coefficient_Delta(1);
+
+    double b_1 = 0;
+    double b_2 = 0;
+    double b_3 = 0;
+
+    b_1 += alpha_0 * delta_0;
+    b_1 += gamma_1 * delta_1;
+    b_1 += (3 / 8);
+
+    b_2 += gamma_0 * delta_0;
+    b_2 += alpha_1 * delta_1;
+    b_2 += (3 / 8);
+
+    b_3 += gamma_0 * delta_0;
+    b_3 += gamma_1 * delta_1;
+    b_3 += (1 / 8);
+
+    B << 
+        b_1,
+        b_2,
+        b_3,
+        b_3;
+}
+
 void WT_Solve_Weights(
     const double n_0,
     const double n_1,
     const double n_2,
-    const double n_3
+    const double n_3,
+    Eigen::Vector4d& W
 ) {
+    Eigen::MatrixX4d A;
+    WT_Get_A(n_0, n_1, n_2, n_3, A);
 
-}
+    Eigen::Vector4d B;
+    WT_GET_B(B);
+
+    W = A.inverse() * B;
+}   
 
