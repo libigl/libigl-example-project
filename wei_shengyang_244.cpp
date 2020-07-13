@@ -1,8 +1,5 @@
 #include <igl/PI.h>
 #include <igl/upsample.h>
-#include <iostream>
-#include <vector>
-#include <map>
 
 // Wei Shengyang Lifted Loop WT: 2.4.4
 
@@ -173,5 +170,126 @@ double WT_Coefficient_Gamma(
 double WT_Coefficient_Delta(
     const double n
 ) {
-    return (1 / n) * (1 - ((8 / 5) * WT_scale_common(n))); 
+    return (1 / n) * (1 - (8 / 5) * WT_scale_common(n)); 
 }
+
+void WT_Get_A(
+    const double n_0,
+    const double n_1,
+    const double n_2,
+    const double n_3,
+    Eigen::MatrixX4d& A
+) {
+    // Coefficients
+
+    const double alpha_1 = WT_Coefficient_Alpha(1);
+    const double alpha_2 = WT_Coefficient_Alpha(2);
+    const double alpha_3 = WT_Coefficient_Alpha(3);
+    const double alpha_4 = WT_Coefficient_Alpha(4);
+
+    const double gamma_0 = WT_Coefficient_Gamma(0);
+    const double gamma_1 = WT_Coefficient_Gamma(1);
+    const double gamma_2 = WT_Coefficient_Gamma(2);
+    const double gamma_3 = WT_Coefficient_Gamma(3);
+    const double gamma_4 = WT_Coefficient_Gamma(4);
+
+    /** START OF VARIABLE INITIALIZATION **/
+
+    /** 
+     * IDENTITY BOYOS
+    */
+    double a_11 = 0;
+    double a_22 = 0;
+    double a_33 = 0;
+    double a_44 = 0;
+
+    /** 
+     * Mirror-able
+     * These values can be mirrored. i.e. a_12 == a_21, a_13 == a_31, etc...
+    */
+    double a_12 = 0;
+    double a_13 = 0;
+    double a_14 = 0;
+    double a_23 = 0;
+    double a_24 = 0;
+    double a_34 = 0;
+
+    /** END OF VARIABLE INITIALIZATION **/
+
+    // Hair-loss-math-time (its not hard just exhaustive)
+    // first start with the IDENTITY BOYOS
+
+    a_11 += std::pow(alpha_1, 2);
+    a_11 += std::pow(gamma_2, 2);
+    a_11 += std::pow(gamma_3, 2);
+    a_11 += std::pow(gamma_4, 2);
+    a_11 += (1 / 256) * (n_0 - 3);
+    a_11 += (5 / 32) * n_0;
+
+    a_22 += std::pow(gamma_1, 2);
+    a_22 += std::pow(alpha_2, 2);
+    a_22 += std::pow(gamma_3, 2);
+    a_22 += std::pow(gamma_4, 2);
+    a_22 += (1 / 256) * (n_1 - 3);
+    a_22 += (5 / 32) * n_1;
+
+    a_33 += std::pow(gamma_0, 2);
+    a_33 += std::pow(gamma_1, 2);
+    a_33 += std::pow(alpha_2, 2);
+    a_33 += (1 / 256) * (n_2 - 3);
+    a_33 += (5 / 32) * n_2;
+
+    a_44 += std::pow(gamma_0, 2);
+    a_44 += std::pow(gamma_1, 2);
+    a_44 += std::pow(alpha_3, 2);
+    a_44 += (1 / 256) * (n_3 - 3);
+    a_44 += (5 / 32) * n_3;
+
+    // lastly the mirror bois
+
+    a_12 += alpha_1 * gamma_1;
+    a_12 += gamma_2 * alpha_1;
+    a_12 += std::pow(gamma_3, 2);
+    a_12 += std::pow(gamma_4, 2);
+    a_12 += (21 / 64);
+
+    a_13 += alpha_1 * gamma_1;
+    a_13 += std::pow(gamma_2, 2);
+    a_13 += gamma_3 * alpha_3;
+    a_13 += (85 / 256);
+
+    a_14 += alpha_1 * gamma_1;
+    a_14 += std::pow(gamma_2, 2);
+    a_14 += gamma_4 * alpha_4;
+    a_14 += (85 / 256);
+    
+    a_23 += std::pow(gamma_0, 2);
+    a_23 += alpha_1 * gamma_1;
+    a_23 += gamma_2 * alpha_2;
+    a_23 += (85 / 256);
+
+    a_24 += std::pow(gamma_0, 2);
+    a_24 += alpha_1 * gamma_1;
+    a_24 += gamma_3 * alpha_3;
+    a_24 += (85 / 256);
+
+    a_34 += std::pow(gamma_0, 2);
+    a_34 += std::pow(gamma_1, 2);
+    a_34 += (1 / 64);
+
+    A << 
+        a_11, a_12, a_13, a_14,
+        a_12, a_22, a_23, a_24,
+        a_13, a_23, a_33, a_34,
+        a_14, a_24, a_34, a_44;
+}
+
+void WT_Solve_Weights(
+    const double n_0,
+    const double n_1,
+    const double n_2,
+    const double n_3
+) {
+
+}
+
