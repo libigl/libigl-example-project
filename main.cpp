@@ -49,9 +49,8 @@ int main(int argc, char * argv[])
     7,5,6,
     7,6,1).finished().array()-1; // Test
 
-
-  // string repo_path = "/Users/mihcelle/Documents/wavelets/libigl-example-project/";
-  // const string mesh_path = repo_path + "001.obj";
+  // string repo_path = "/home/michelle/Documents/LIBIGL/hackathon/libigl-example-project/";
+  // const string mesh_path = repo_path + "knightloop.off";
   // igl::read_triangle_mesh(mesh_path,OV,OF);
 
   V = OV;
@@ -106,23 +105,22 @@ int main(int argc, char * argv[])
       return true;
     };
 
-  igl::upsample( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
+  igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
+  // igl::upsample( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
 
 	Eigen::MatrixXi F_old;
 	Eigen::MatrixXd V_old;
 	Eigen::MatrixXi F_new;
 	Eigen::MatrixXd V_new;
-  is_quadrisection(F, V, F_old, V_old, F_new, V_new);
-
+  if(is_quadrisection(F, V, F_old, V_old, F_new, V_new))
+  {
+    V = V_old;
+    F = F_old;
+    viewer.data().clear();
+    viewer.data().set_mesh(V,F);
+    viewer.data().set_face_based(true);
+    viewer.launch();
+  }
   // Henrik takes nice photos
-
-  V = V_old;
-  F = F_old;
-
-  viewer.data().clear();
-  viewer.data().set_mesh(V,F);
-  viewer.data().set_face_based(true);
-
-  viewer.launch();
 
 }

@@ -1,5 +1,6 @@
 #include "taubin.h"
 #include <igl/upsample.h>
+#include <igl/loop.h>
 #include <iostream>
 #include <vector>
 #include <map>
@@ -32,9 +33,10 @@ bool is_quadrisection(
 	std::cout << "Begin connected components" << std::endl;
   connected_components(F_c, sub_meshes);
 	std::cout << "Completed connected components" << std::endl;
+	std::cout << "Number of candidates: " << sub_meshes.size() << std::endl;
 
-	std::cout << "F_old OG row size: " << F_old.rows() << std::endl;
-	std::cout << "V_old OG row size: " << V_old.rows() << std::endl;
+	// std::cout << "F_old OG row size: " << F_old.rows() << std::endl;
+	// std::cout << "V_old OG row size: " << V_old.rows() << std::endl;
 
 	// Find a candidate connected component
 	for(auto it=sub_meshes.begin(); it!=sub_meshes.end(); it++)
@@ -45,6 +47,7 @@ bool is_quadrisection(
 			return true;
 		}
 	}
+	std::cout << "Failed" << std::endl;
 	return false;
 };
 
@@ -145,13 +148,6 @@ void connected_components(
 	std::map<std::pair<int,int>, std::vector<int>>::iterator it = incident_tiles.begin();
 	while (it != incident_tiles.end())
 	{
-		if(it->second.size()==3)
-		{
-			std::cout << it->second[0] << std::endl;
-			std::cout << it->second[1] << std::endl;
-			std::cout << it->second[2] << std::endl;
-			std::cout << "-------" << std::endl;
-		}
 		assert((it->second).size()<=2);
 		if((it->second).size()==2)
 		{
@@ -159,13 +155,17 @@ void connected_components(
 			int tid2 = it->second[1];
 			if(where_are_you[tid1]!=where_are_you[tid2])
 			{
+				assert(where_are_you[tid1]!=NULL && where_are_you[2]!=NULL);
+				where_are_you[tid1]->resize(where_are_you[tid1]->size());
 				where_are_you[tid1]->insert(
 					where_are_you[tid1]->end(),
 					where_are_you[tid2]->begin(),
 					where_are_you[tid2]->end()
 				);
-				delete where_are_you[tid2];
+				std::vector<int>* temp;
+				temp = where_are_you[tid2];
 				where_are_you[tid2] = where_are_you[tid1];
+				delete temp;
 			}
 			else
 			{
@@ -280,7 +280,7 @@ void is_equivalence(
 			Eigen::MatrixXd V_pre_subdiv = Eigen::MatrixXd(submesh_vertices);
 
 			// Subdivide the candidate
-			igl::upsample( Eigen::MatrixXd(
+			igl::loop( Eigen::MatrixXd(
 				Eigen::MatrixXd(submesh_vertices)), 
 				Eigen::MatrixXi(submesh), 
 				submesh_vertices, 
