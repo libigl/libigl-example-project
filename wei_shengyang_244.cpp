@@ -22,12 +22,21 @@ double WT_scale_common(
 */
 
 void WT_Lifting_1(
-    Eigen::Vector3d& v,
-    Eigen::Vector3d v1,
-    Eigen::Vector3d v2,
+    const Eigen::Vector3d v,
+    const Eigen::Vector3d v1,
+    const Eigen::Vector3d v2,
     Eigen::Vector3d& v_prime
 ) {
     v_prime = v - (0.25 * (v1 + v2));
+}
+
+void WT_Lifting_1_inverse(
+    const Eigen::Vector3d v_prime,
+    const Eigen::Vector3d v1,
+    const Eigen::Vector3d v2,
+    Eigen::Vector3d& v
+) {
+    v = v_prime + (0.25 * (v1 + v2));
 }
 
 /**
@@ -38,12 +47,21 @@ void WT_Lifting_1(
 */
 
 void WT_Lifting_2(
-    Eigen::Vector3d& v,
-    Eigen::Vector3d v1,
-    Eigen::Vector3d v2,
+    const Eigen::Vector3d v,
+    const Eigen::Vector3d v1,
+    const Eigen::Vector3d v2,
     Eigen::Vector3d& v_prime
 ) {
     v_prime = v - (0.5 * (v1 + v2));
+}
+
+void WT_Lifting_2_inverse(
+    const Eigen::Vector3d v_prime,
+    const Eigen::Vector3d v1,
+    const Eigen::Vector3d v2,
+    Eigen::Vector3d& v
+) {
+    v = v_prime + (0.5 * (v1 + v2));
 }
 
 // Scalar delta function for Lifting III (3)
@@ -65,23 +83,35 @@ double scalar_delta(
  * value v` of v is given by
 */
 
+Eigen::Vector3d WT_Lifting_3_getScalarDeltaSum(
+    const Eigen::MatrixX3d vertices
+) {
+    Eigen::Vector3d sum;
+    sum << 0, 0, 0;
+
+    int len = vertices.rows();
+    for(int j = 0; j < len; j++) {
+        sum += vertices.row(j);
+    }
+
+    return scalar_delta(len) * sum;
+}
+
 void WT_Lifting_3(
     const Eigen::MatrixX3d vertices,
     const Eigen::Vector3d v,
     Eigen::Vector3d& v_prime
 ) {
-    int len = vertices.rows();
-    
-    Eigen::Vector3d sum;
-    sum << 0, 0, 0;
-
-    for(int j = 0; j < len; j++) {
-        sum += vertices.row(j);
-    }
-
-    v_prime = v - (scalar_delta(len) * sum);
+    v_prime = v - WT_Lifting_3_getScalarDeltaSum(vertices);
 }
 
+void WT_Lifting_3_inverse(
+    const Eigen::Vector3d v_prime,
+    const Eigen::MatrixX3d vertices,
+    Eigen::Vector3d& v
+) {
+    v = v_prime + WT_Lifting_3_getScalarDeltaSum(vertices);
+}
 
 /**
  * Scaling. 
@@ -95,6 +125,14 @@ void WT_Scaling(
     Eigen::Vector3d& v_prime 
 ) {
     v_prime = v / ((8 / 5) * WT_scale_common(n));    
+}
+
+void WT_Scaling_inverse(
+    const Eigen::Vector3d v_prime, 
+    const double n,
+    Eigen::Vector3d& v
+) {
+    v = v_prime * ((8 / 5) * WT_scale_common(n));    
 }
 
 /**
@@ -116,6 +154,21 @@ void WT_Lifting_4(
 
     v_prime = v - (three_eigths + one_eigth); 
 }
+
+void WT_Lifting_4_inverse(
+    Eigen::Vector3d& v_prime,
+    const Eigen::Vector3d v1,
+    const Eigen::Vector3d v2,
+    const Eigen::Vector3d v3,
+    const Eigen::Vector3d v4,
+    Eigen::Vector3d& v
+) {
+    const Eigen::Vector3d three_eigths = (3/8) * (v1 + v2);
+    const Eigen::Vector3d one_eigth = (1/8) * (v3 + v4); 
+
+    v = v_prime + (three_eigths + one_eigth); 
+}
+
 
 /** 
  * Lifting V. 
@@ -143,6 +196,26 @@ void WT_Lifting_5(
     v2_prime = v2 - (n_23 * v);
     v3_prime = v3 - (n_23 * v);
     v4_prime = v4 - (n_14 * v);
+}
+
+void WT_Lifting_5_inverse(
+    const Eigen::Vector3d v,
+    const Eigen::Vector3d v1_prime,
+    const Eigen::Vector3d v2_prime,
+    const Eigen::Vector3d v3_prime,
+    const Eigen::Vector3d v4_prime,
+    Eigen::Vector3d& v1,
+    Eigen::Vector3d& v2,
+    Eigen::Vector3d& v3,
+    Eigen::Vector3d& v4
+) {
+    const double n_14 = -0.525336;
+    const double n_23 = 0.189068;
+
+    v1 = v1_prime + (n_14 * v);
+    v2 = v2_prime + (n_23 * v);
+    v3 = v3_prime + (n_23 * v);
+    v4 = v4_prime + (n_14 * v);
 }
 
 /**
@@ -335,3 +408,20 @@ void WT_Solve_Weights(
     W = A.inverse() * B;
 }   
 
+void WT_Lifting_6(
+    const Eigen::Vector3d v_i,
+    const double omega_i,
+    const Eigen::Vector3d v,
+    Eigen::Vector3d& v_i_prime
+) {
+    v_i_prime = v_i - omega_i * v;
+}
+
+void WT_Lifting_6_inverse(
+    const Eigen::Vector3d v_i_prime,
+    const double omega_i,
+    const Eigen::Vector3d v,
+    Eigen::Vector3d& v_i
+) {
+    v_i = v_i_prime + omega_i * v;
+}
