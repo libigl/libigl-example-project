@@ -23,7 +23,6 @@ bool is_quadrisection(
   std::cout << "Num verts in input mesh: " << V_in.rows() << std::endl;
   std::cout << "Num faces in input mesh: " << F_in.rows() << std::endl;
   
-	
 	// Construct a bunch of tiles
 	std::cout << "Begin covering mesh" << std::endl;
   Eigen::MatrixXi tiles; // A tile soup!
@@ -256,72 +255,29 @@ void is_equivalence(
 		// Second test
 		if(V_i.size()+incident_tiles.size()==V_in.rows())
 		{
-			// Create a matrix of vertex positions
-			// with new index names
-			Eigen::MatrixXd submesh_vertices; // "Vertex positions" from candidate
-			submesh_vertices.setIdentity(V_i.size(), 3);
-			int v=0;
-			std::map<int,int> vert_translator;
-			for(auto it2=V_i.begin(); it2!=V_i.end(); it2++)
-			{
-				for(int i=0; i<3; i++)
-				{
-					vert_translator[*it2] = v;
-					submesh_vertices(v,i) = V_in(*it2,i);
-				}
-				v++;
-			}
-
-			// Rename the vids in submesh to point to 
-			// vids in submesh_vertices as opposed 
-			// to V, cause they used to have the
-			// corners of the current candidate tile.
-			for(int f=0; f<submesh.rows(); f++)
-			{
-				submesh(f,0) = vert_translator[submesh(f,0)];
-				submesh(f,1) = vert_translator[submesh(f,1)];
-				submesh(f,2) = vert_translator[submesh(f,2)];
-			}
-
-			Eigen::MatrixXi F_pre_subdiv = Eigen::MatrixXi(submesh);
-			Eigen::MatrixXd V_pre_subdiv = Eigen::MatrixXd(submesh_vertices);
-
-			// Subdivide the candidate
-			igl::upsample( Eigen::MatrixXd(
-				Eigen::MatrixXd(submesh_vertices)), 
-				Eigen::MatrixXi(submesh), 
-				submesh_vertices, 
-				submesh);
-			assert(V_in.rows()==submesh_vertices.rows());
-			assert(V_in.cols()==submesh_vertices.cols());
-
 			// Make sure that every vert in the subdivided
 			// candidate can be found in the original V
 			int found = true;
 			int temp = false;
-			std::map<int,bool> ov_visited;
-			for(int v=0;v<V_in.rows();v++)
+			int visited_cout = 0;
+			std::map<int,bool> f_visited;
+			for(int f=0;f<F_in.rows();f++)
 			{
-				ov_visited[v] = false;
+				f_visited[f] = false;
 			}
-			for(int v=0; v<submesh_vertices.rows(); v++)
+
+			for(auto it2=candidate.begin(); it2!=candidate.end(); it2++)
 			{
-				for(int ov=0; ov<V_in.rows();ov++)
+				
+				for(int i=0; i<4; i++)
 				{
-					if(
-						submesh_vertices(v,0)==V_in(ov,0) &&
-						submesh_vertices(v,1)==V_in(ov,1) &&
-						submesh_vertices(v,2)==V_in(ov,2) &&
-						ov_visited[ov] == false
-					){
+					if(!f_visited[covered_faces(*it2,i)])
+					{
+						f_visited[covered_faces(*it2,i)] = true;
+						visited_cout++;
 						temp = true;
-						ov_visited[ov] = true;
-						std::cout << "Vertex " << v 
-											<< " was found at location " 
-											<< ov << " !" << std::endl;
 					}
 				}
-
 				if(temp==true)
 				{
 					temp = false;
@@ -333,9 +289,48 @@ void is_equivalence(
 			}
 
 			// Third (final) test
-			if(found) 
+			if(found && visited_cout==F_in.rows()) 
 			{ 
 				std::cout << "Gagnant!" << std::endl; 
+				// Create a matrix of vertex positions
+				// with new index names
+				Eigen::MatrixXd submesh_vertices; // "Vertex positions" from candidate
+				submesh_vertices.setIdentity(V_i.size(), 3);
+				int v=0;
+				std::map<int,int> vert_translator;
+				for(auto it2=V_i.begin(); it2!=V_i.end(); it2++)
+				{
+					for(int i=0; i<3; i++)
+					{
+						vert_translator[*it2] = v;
+						submesh_vertices(v,i) = V_in(*it2,i);
+					}
+					v++;
+				}
+
+				// Rename the vids in submesh to point to 
+				// vids in submesh_vertices as opposed 
+				// to V, cause they used to have the
+				// corners of the current candidate tile.
+				for(int f=0; f<submesh.rows(); f++)
+				{
+					submesh(f,0) = vert_translator[submesh(f,0)];
+					submesh(f,1) = vert_translator[submesh(f,1)];
+					submesh(f,2) = vert_translator[submesh(f,2)];
+				}
+
+				Eigen::MatrixXi F_pre_subdiv = Eigen::MatrixXi(submesh);
+				Eigen::MatrixXd V_pre_subdiv = Eigen::MatrixXd(submesh_vertices);
+
+				// Subdivide the candidate
+				igl::upsample( Eigen::MatrixXd(
+					Eigen::MatrixXd(submesh_vertices)), 
+					Eigen::MatrixXi(submesh), 
+					submesh_vertices, 
+					submesh);
+				assert(V_in.rows()==submesh_vertices.rows());
+				assert(V_in.cols()==submesh_vertices.cols());
+
 				F_old = F_pre_subdiv;
 				V_old = V_pre_subdiv;
 				F_new = submesh.block(F_old.rows()-1, 0, submesh.rows()-F_old.rows(), 3);
