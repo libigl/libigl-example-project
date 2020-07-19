@@ -49,9 +49,9 @@ int main(int argc, char * argv[])
     7,5,6,
     7,6,1).finished().array()-1; // Test
 
-  // string repo_path = "/home/michelle/Documents/LIBIGL/hackathon/libigl-example-project/";
-  // const string mesh_path = repo_path + "knightloop.off";
-  // igl::read_triangle_mesh(mesh_path,OV,OF);
+  string repo_path = "/home/michelle/Documents/LIBIGL/hackathon/libigl-example-project/";
+  const string mesh_path = repo_path + "knightloop.off";
+  igl::read_triangle_mesh(mesh_path,OV,OF);
 
   V = OV;
   F = OF;
@@ -105,8 +105,11 @@ int main(int argc, char * argv[])
       return true;
     };
 
-  igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
-  igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
+  // igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
+  // igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
+  // igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
+  // igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
+  // igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
   // igl::upsample( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
   // igl::upsample( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
 

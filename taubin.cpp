@@ -129,9 +129,7 @@ void covering_mesh(
 // components from the tiles
 void connected_components(
 	const Eigen::MatrixXi& tiles,
-	// sub_meshes: vector of vectors containing tile ids 
-	// in a single connected component found
- 	std::vector<std::vector<int>>& sub_meshes
+ 	std::vector<std::vector<int>>& sub_meshes // Vector of vectors containing tile ids in a single connected component found
 ){
 	std::map<int, std::vector<int>*> where_are_you; // Which partition is the face in
 	for(int tid=0; tid<tiles.rows(); tid++)
@@ -145,12 +143,12 @@ void connected_components(
 
 	// Get all the edges in the mesh
 	std::map<std::pair<int,int>, std::vector<int>> incident_tiles;
-  	edge_incident_faces(tiles, incident_tiles);
+  edge_incident_faces(tiles, incident_tiles);
 
 	std::map<std::pair<int,int>, std::vector<int>>::iterator it = incident_tiles.begin();
 	while (it != incident_tiles.end())
 	{
-		assert((it->second).size()<=2);
+		// assert((it->second).size()<=2);
 		if((it->second).size()==2)
 		{
 			int tid1 = it->second[0];
@@ -158,16 +156,24 @@ void connected_components(
 			if(where_are_you[tid1]!=where_are_you[tid2])
 			{
 				assert(where_are_you[tid1]!=NULL && where_are_you[2]!=NULL);
-				where_are_you[tid1]->resize(where_are_you[tid1]->size());
+
+				// where_are_you[tid1]->resize(where_are_you[tid1]->size()+where_are_you[tid2]->size());
 				where_are_you[tid1]->insert(
 					where_are_you[tid1]->end(),
 					where_are_you[tid2]->begin(),
 					where_are_you[tid2]->end()
 				);
-				std::vector<int>* temp;
-				temp = where_are_you[tid2];
+
+				for(int i=0; i<where_are_you[tid1]->size(); i++)
+				{
+					if(where_are_you[tid1]->at(i)!=tid2 && where_are_you[tid1]->at(i)!=tid1)
+					{
+						where_are_you[where_are_you[tid1]->at(i)] = where_are_you[tid1];
+					}
+				}
+
+				delete where_are_you[tid2];
 				where_are_you[tid2] = where_are_you[tid1];
-				delete temp;
 			}
 			else
 			{
@@ -245,7 +251,7 @@ void is_equivalence(
 		// submesh has #tilesincandidate rows
 		// where each row has the 3 vids from 
 		// V which make up that tile
-		assert(submesh.rows()==6);
+		// assert(submesh.rows()==6);
 
 		// We need num verts and num edges in candidate
 		// connected component for the second test
