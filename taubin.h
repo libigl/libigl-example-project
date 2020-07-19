@@ -8,34 +8,34 @@
 
 // Taubin methods
 bool is_quadrisection(
-	const Eigen::MatrixXi& F,
-	const Eigen::MatrixXd& V,
+	const Eigen::MatrixXi& F_in,
+	const Eigen::MatrixXd& V_in,
 	Eigen::MatrixXi& F_old,
 	Eigen::MatrixXd& V_old,
 	Eigen::MatrixXi& F_new,
 	Eigen::MatrixXd& V_new
 );
 void covering_mesh(
-	const Eigen::MatrixXi& F,
- 	Eigen::MatrixXi& F_c,
-	std::map<int, std::vector<int>>& tile_sets
+	const Eigen::MatrixXi& F_in,
+ 	Eigen::MatrixXi& tiles,
+ 	Eigen::MatrixXi& covered_faces
 );
 void connected_components(
-	const Eigen::MatrixXi& F,
-	// sub_meshes: vector of vectors containing fids 
-	// in a single connected component found
+	const Eigen::MatrixXi& tiles,
  	std::vector<std::vector<int>>& sub_meshes
 );
 void is_equivalence(
-	const Eigen::MatrixXi& F,
-	const Eigen::MatrixXd& V,
+	const Eigen::MatrixXi& F_in,
+	const Eigen::MatrixXd& V_in,
 	const std::vector<int>& candidate,
-	const Eigen::MatrixXi& F_c,
+	const Eigen::MatrixXi& tiles,
+	const Eigen::MatrixXi& covered_faces,
 	Eigen::MatrixXi& F_old,
 	Eigen::MatrixXd& V_old,
 	Eigen::MatrixXi& F_new,
 	Eigen::MatrixXd& V_new
 );
+
 
 // Helper methods
 void edge_incident_faces(

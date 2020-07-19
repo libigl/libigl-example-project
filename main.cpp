@@ -105,8 +105,8 @@ int main(int argc, char * argv[])
       return true;
     };
 
-  igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
-  // igl::upsample( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
+  // igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
+  igl::upsample( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
 
 	Eigen::MatrixXi F_old;
 	Eigen::MatrixXd V_old;
