@@ -34,6 +34,6 @@ This should find and build the dependencies and create a `example_bin` binary.
 
 From within the `build` directory just issue:
 
-    ./example_bin
+    ./example
 
 A glfw app should launch displaying a 3D cube.
