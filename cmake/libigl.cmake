@@ -6,15 +6,6 @@ include(FetchContent)
 FetchContent_Declare(
     libigl
     GIT_REPOSITORY https://github.com/libigl/libigl.git
-    GIT_TAG v2.3.0
+    GIT_TAG b0fd49d59840b5a48e79096462d3198a5c13eee9
 )
-
-# Note: In libigl v3.0.0, the following will become a one-liner:
-# FetchContent_MakeAvailable(libigl)
-
-FetchContent_GetProperties(libigl)
-if(NOT libigl_POPULATED)
-    FetchContent_Populate(libigl)
-endif()
-list(PREPEND CMAKE_MODULE_PATH "${libigl_SOURCE_DIR}/cmake")
-include(${libigl_SOURCE_DIR}/cmake/libigl.cmake)
+FetchContent_MakeAvailable(libigl)
