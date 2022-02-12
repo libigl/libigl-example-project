@@ -4,7 +4,7 @@ project(example)
 list(PREPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # Libigl
-option(LIBIGL_WITH_GLFW "Build target igl::glfw" ON)
+option(LIBIGL_GLFW "Build target igl::glfw" ON)
 include(libigl)
 
 # Add your project files
