@@ -4,8 +4,10 @@ project(example)
 list(PREPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # Libigl
-option(LIBIGL_GLFW "Build target igl::glfw" ON)
 include(libigl)
+
+# Enable the target igl::glfw
+igl_include(glfw)
 
 # Add your project files
 file(GLOB SRC_FILES *.cpp)
