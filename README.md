@@ -35,7 +35,7 @@ Compile this project using the standard cmake routine:
     cmake ..
     make
 
-This should find and build the dependencies and create a `example_bin` binary.
+This should find and build the dependencies and create a `example` binary.
 
 ## Run
 
