@@ -44,3 +44,28 @@ From within the `build` directory just issue:
     ./example
 
 A glfw app should launch displaying a 3D cube.
+
+## Using other modules of libigl
+
+This example project uses the `igl::opengl::glfw::Viewer`, therefore it requires
+the glfw module of libigl. This shows up in the CMakeLists.txt 
+
+```cmake
+igl_include(glfw)
+…
+target_link_libraries(${PROJECT_NAME} PUBLIC igl::glfw)
+```
+
+Suppose you also wanted to use the triangle module in libigl. Then you would
+change these to
+
+```cmake
+igl_include(glfw)
+igl_include(restricted triangle)
+…
+target_link_libraries(${PROJECT_NAME} PUBLIC igl::glfw igl_restricted::triangle)
+```
+
+The "restricted" appears in this case because the triangle library has a more
+restricted license than libigl. See other examples commented out in
+CMakeLists.txt.
