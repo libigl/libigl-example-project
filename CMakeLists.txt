@@ -8,6 +8,10 @@ include(libigl)
 
 # Enable the target igl::glfw
 igl_include(glfw)
+find_package(CGAL REQUIRED)
+
+
+
 # Other modules you could enable
 #igl_include(embree)
 #igl_include(imgui)
@@ -47,3 +51,5 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
   # igl_restricted::mosek
   # igl_restricted::triangle
   )
+
+target_link_libraries(example PRIVATE CGAL::CGAL)
